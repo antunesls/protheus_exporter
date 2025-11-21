@@ -1,7 +1,8 @@
 from flask import Flask, request, jsonify
-from prometheus_client import Counter, generate_latest, CONTENT_TYPE_LATEST
+from prometheus_client import Counter, Gauge, generate_latest, CONTENT_TYPE_LATEST
 import threading
 import os
+import time
 
 app = Flask(__name__)
 
@@ -30,6 +31,13 @@ ROUTINE_USER_CALLS = Counter(
     "protheus_routine_user_calls_total",
     "Total de chamadas de rotinas no Protheus por usuário",
     ["routine", "environment", "user", "user_name", "company", "branch", "module"],
+)
+
+# Métrica de uptime do exporter
+EXPORTER_START_TIME = time.time()
+EXPORTER_UPTIME = Gauge(
+    "protheus_exporter_uptime_seconds",
+    "Tempo em segundos desde que o exporter foi iniciado"
 )
 
 lock = threading.Lock()
@@ -103,6 +111,8 @@ def track():
 # -------------------------------------------------------------------
 @app.route("/metrics", methods=["GET"])
 def metrics():
+    # Atualizar uptime antes de gerar métricas
+    EXPORTER_UPTIME.set(time.time() - EXPORTER_START_TIME)
     data = generate_latest()
     return data, 200, {"Content-Type": CONTENT_TYPE_LATEST}
 

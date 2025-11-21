@@ -80,7 +80,7 @@
       "pluginVersion": "9.5.0",
       "targets": [
         {
-          "expr": "sum(rate(protheus_routine_user_calls_total[5m])) * 60",
+          "expr": "sum(increase(protheus_routine_user_calls_total[5m])) / 5",
           "refId": "A"
         }
       ],
@@ -703,7 +703,7 @@
       },
       "targets": [
         {
-          "expr": "rate(protheus_routine_user_calls_total[5m]) * 60",
+          "expr": "increase(protheus_routine_user_calls_total[5m]) / 5 * 60",
           "legendFormat": "{{routine}}",
           "refId": "A"
         }
