@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   protheus-exporter:
-    image: antunesls/protheus_exporter:0.1
+    build:
+      context: ../..
+      dockerfile: deployments/docker/Dockerfile
     ports:
       - "8000:8000"
     environment:
@@ -20,8 +22,8 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./prometheus/alert_rules.yml:/etc/prometheus/alert_rules.yml
+      - ../../configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ../../configs/prometheus/alert_rules.yml:/etc/prometheus/alert_rules.yml
       - prometheus_data:/prometheus
       - prometheus_config:/etc/prometheus
     command:
@@ -42,8 +44,8 @@ services:
       - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ../../configs/grafana/provisioning:/etc/grafana/provisioning
+      - ../../configs/grafana/dashboards:/var/lib/grafana/dashboards
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin123
       - GF_USERS_ALLOW_SIGN_UP=false

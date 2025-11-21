@@ -13,7 +13,7 @@ Acesse: http://localhost:3000 (admin/admin123)
 ### Método 2: Importação Manual
 1. Faça login no Grafana
 2. Vá em **Dashboards → Import**
-3. Cole o conteúdo de [`grafana-dashboard-protheus-metrics.json`](../grafana-dashboard-protheus-metrics.json)
+3. Cole o conteúdo de [`docker/grafana/dashboards/protheus-metrics.json`](./docker/grafana/dashboards/protheus-metrics.json)
 4. Configure o datasource do Prometheus
 
 ## 📈 Visualizações

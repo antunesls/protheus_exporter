@@ -215,5 +215,3 @@ temp*/
 
 # Docker
 .dockerignore
-run_server.bat
-activate_env.bat
