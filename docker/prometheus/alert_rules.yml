@@ -1,0 +1,42 @@
+groups:
+  - name: protheus.rules
+    rules:
+      # Alert para alta taxa de execuções
+      - alert: HighExecutionRate
+        expr: rate(protheus_routine_user_calls_total[5m]) * 60 > 100
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Alta taxa de execução detectada"
+          description: "A rotina {{ $labels.routine }} está executando mais de 100 vezes por minuto"
+
+      # Alert para rotina não executada há muito tempo
+      - alert: RoutineNotExecuted
+        expr: time() - protheus_routine_user_calls_total > 3600
+        for: 5m
+        labels:
+          severity: info
+        annotations:
+          summary: "Rotina não executada há mais de 1 hora"
+          description: "A rotina {{ $labels.routine }} não foi executada nas últimas 1 hora"
+
+      # Alert para usuário muito ativo
+      - alert: VeryActiveUser
+        expr: rate(protheus_routine_user_calls_total[1h]) * 3600 > 1000
+        for: 5m
+        labels:
+          severity: info
+        annotations:
+          summary: "Usuário muito ativo detectado"
+          description: "O usuário {{ $labels.userprot }} executou mais de 1000 rotinas na última hora"
+
+      # Alert para exporter offline
+      - alert: ExporterDown
+        expr: up{job="protheus-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Protheus Exporter está offline"
+          description: "O Protheus Exporter não está respondendo há mais de 1 minuto"

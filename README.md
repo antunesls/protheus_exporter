@@ -57,7 +57,14 @@ protheus_exporter/
 ├── 🐳 docker/                   # Configurações Docker
 │   ├── Dockerfile              # Container do exporter
 │   ├── docker-compose.yml      # Stack completa (build local)
-│   └── docker-compose-hub.yml  # Stack completa (Docker Hub)
+│   ├── docker-compose-hub.yml  # Stack completa (Docker Hub)
+│   ├── grafana/                # Configurações Grafana
+│   │   ├── provisioning/       # Auto-configuração datasources/dashboards
+│   │   └── dashboards/         # Dashboard JSON
+│   └── prometheus/             # Configurações Prometheus
+│       ├── prometheus.yml      # Configuração principal
+│       ├── alert_rules.yml     # Regras de alertas
+│       └── README-ALERTS.md    # Documentação alertas
 ├── 📊 prometheus.yml            # Configuração do Prometheus
 ├── 🎯 grafana-dashboard-protheus-metrics.json  # Dashboard Grafana
 ├── 📖 GRAFANA-DASHBOARD.md      # Documentação do dashboard
@@ -255,10 +262,22 @@ cMetrics := u_PromExportMetrics()
 
 ## 📊 Configuração do Prometheus
 
-### prometheus.yml
+### Configuração Automática (Docker)
+As configurações do Prometheus são automaticamente aplicadas via Docker:
+
 ```yaml
+# Configuração otimizada incluída
+- Coleta de métricas a cada 30s
+- Retenção de dados por 200h
+- Regras de alertas configuradas
+- API admin habilitada
+```
+
+### Configuração Manual
+```yaml
+# prometheus.yml personalizado
 scrape_configs:
-  - job_name: 'protheus-python'
+  - job_name: 'protheus-exporter'
     static_configs:
       - targets: ['localhost:8000']
     metrics_path: '/metrics'
@@ -270,6 +289,14 @@ scrape_configs:
     metrics_path: '/rest/protheus_exporter/'
     scrape_interval: 30s
 ```
+
+### 🚨 **Alertas Configurados**
+- **HighExecutionRate:** >100 exec/min
+- **RoutineNotExecuted:** >1h sem execução  
+- **VeryActiveUser:** >1000 exec/h por usuário
+- **ExporterDown:** Exporter offline
+
+📖 **Documentação completa:** [docker/prometheus/README-ALERTS.md](./docker/prometheus/README-ALERTS.md)
 
 ## 📈 Métricas Disponíveis
 
