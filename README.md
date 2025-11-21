@@ -14,6 +14,36 @@ Solução completa para exportar métricas do Protheus para o Prometheus, inclui
 - **Ambiente Containerizado**: Docker support para deploy fácil
 - **Interceptação Automática**: Hook em todas as rotinas via CHKEXEC
 
+## 🚀 Início Rápido
+
+### Método mais simples (Docker Hub):
+```bash
+# 1. Baixar e executar o exporter
+docker run -d -p 8000:8000 --name protheus-exporter antunesls/protheus_exporter:0.1
+
+# 2. Testar se está funcionando
+curl http://localhost:8000/health
+
+# 3. Ver métricas
+curl http://localhost:8000/metrics
+```
+
+### Stack completa com Prometheus + Grafana:
+```bash
+# 1. Clone o repositório
+git clone https://github.com/antunesls/protheus_exporter.git
+cd protheus_exporter
+
+# 2. Execute a stack completa
+docker-compose -f docker/docker-compose-hub.yml up -d
+
+# 3. Acesse as interfaces:
+# - Exporter: http://localhost:8000
+# - Prometheus: http://localhost:9090
+# - Grafana: http://localhost:3000 (admin/admin123)
+# - Dashboard será automaticamente importado!
+```
+
 ## 📁 Estrutura do Projeto
 
 ```
@@ -26,8 +56,11 @@ protheus_exporter/
 │   └── run_server.bat          # Script para executar servidor (Windows)
 ├── 🐳 docker/                   # Configurações Docker
 │   ├── Dockerfile              # Container do exporter
-│   └── docker-compose.yml      # Stack completa
+│   ├── docker-compose.yml      # Stack completa (build local)
+│   └── docker-compose-hub.yml  # Stack completa (Docker Hub)
 ├── 📊 prometheus.yml            # Configuração do Prometheus
+├── 🎯 grafana-dashboard-protheus-metrics.json  # Dashboard Grafana
+├── 📖 GRAFANA-DASHBOARD.md      # Documentação do dashboard
 ├── 📜 protheus/                 # Código Protheus
 │   ├── CHKEXEC.PRW            # Hook de interceptação
 │   ├── zproexpo.prw           # Exporter nativo Protheus
@@ -81,18 +114,37 @@ run_server.bat
 
 ## 🐳 Docker
 
-### Build da imagem
+### Opção 1: Usar imagem do Docker Hub (Recomendado)
+```bash
+# Pull da imagem oficial
+docker pull antunesls/protheus_exporter:0.1
+
+# Executar container
+docker run -p 8000:8000 antunesls/protheus_exporter:0.1
+```
+
+### Opção 2: Build local da imagem
 ```bash
 # A partir da raiz do projeto
 docker build -f docker/Dockerfile -t protheus-exporter .
-```
 
-### Executar container
-```bash
+# Executar container
 docker run -p 8000:8000 protheus-exporter
 ```
 
 ### Docker Compose (stack completa)
+
+**Usando imagem do Docker Hub (Mais rápido):**
+```bash
+# A partir da pasta docker
+cd docker
+docker-compose -f docker-compose-hub.yml up -d
+
+# Ou da raiz do projeto
+docker-compose -f docker/docker-compose-hub.yml up -d
+```
+
+**Usando build local:**
 ```bash
 # A partir da pasta docker
 cd docker
@@ -230,6 +282,81 @@ scrape_configs:
 - **Tipo:** Counter  
 - **Labels:** routine, environment, user, company, branch, module
 - **Descrição:** Total de chamadas por usuário (alta cardinalidade)
+
+## 📊 Dashboard do Grafana
+
+### Importando o Dashboard
+
+1. **Via arquivo JSON:**
+   - Baixe o arquivo [`grafana-dashboard-protheus-metrics.json`](./grafana-dashboard-protheus-metrics.json)
+   - No Grafana, vá em **Dashboards > Import**
+   - Cole o conteúdo do JSON ou faça upload do arquivo
+
+2. **Configuração automática (Docker):**
+   ```bash
+   docker-compose -f docker/docker-compose-hub.yml up -d
+   ```
+   O dashboard será automaticamente importado quando usar o docker-compose.
+
+### 📈 Visualizações Incluídas
+
+#### 📊 **Visão Geral**
+- **Execuções/min:** Taxa atual de execuções por minuto
+- **Total de Rotinas:** Número de rotinas distintas
+- **Usuários Ativos:** Usuários únicos que executaram rotinas
+- **Total Execuções:** Contador total acumulado
+
+#### 🔝 **Top 5 Rankings**
+- **Top 5 Rotinas Mais Usadas:** Ranking das rotinas com mais execuções
+- **Top 5 Rotinas Menos Usadas:** Rotinas com menor utilização
+- **Top 5 Usuários Mais Ativos:** Usuários com mais execuções
+- **Top 5 Usuários Menos Ativos:** Usuários com menor atividade
+
+#### 📈 **Análise Temporal**
+- **Taxa de Execução por Minuto:** Gráfico de linhas mostrando execuções/min ao longo do tempo
+
+#### 🏢 **Análise Organizacional**
+- **Distribuição por Empresa:** Pizza chart com execuções por empresa
+- **Distribuição por Filial:** Pizza chart com execuções por filial
+
+#### 🔧 **Análise por Módulo**
+- **Uso por Módulo:** Pizza chart com distribuição por módulo do Protheus
+- **Detalhamento por Módulo:** Tabela com totais por módulo
+
+#### 🌍 **Análise por Ambiente**
+- **Execuções por Ambiente:** Bar chart comparando produção, homologação, etc.
+
+### 🎛️ **Controles Dinâmicos**
+
+O dashboard inclui filtros para segmentação dos dados:
+- **Ambiente:** Filtre por produção, homologação, desenvolvimento
+- **Empresa:** Selecione empresas específicas
+- **Módulo:** Filtre por módulos do Protheus (SIGAFIN, SIGAEST, etc.)
+
+### 🔄 **Configurações**
+- **Atualização automática:** 30 segundos
+- **Período padrão:** Última 1 hora
+- **Tema:** Dark mode otimizado para dashboards
+
+### 🎯 **Casos de Uso**
+
+1. **Monitoramento de Performance:**
+   - Identifique rotinas com alto volume de execuções
+   - Monitore padrões de uso ao longo do dia
+
+2. **Análise de Usuários:**
+   - Identifique usuários mais ativos
+   - Analise padrões de comportamento
+
+3. **Gestão de Recursos:**
+   - Identifique módulos mais utilizados
+   - Planeje recursos por empresa/filial
+
+4. **Troubleshooting:**
+   - Correlacione problemas com picos de execução
+   - Identifique rotinas problemáticas
+
+📖 **Para documentação completa do dashboard, veja:** [GRAFANA-DASHBOARD.md](./GRAFANA-DASHBOARD.md)
 
 ### 🔧 Desenvolvimento
 
