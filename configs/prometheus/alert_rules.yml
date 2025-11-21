@@ -29,7 +29,7 @@ groups:
           severity: info
         annotations:
           summary: "Usuário muito ativo detectado"
-          description: "O usuário {{ $labels.userprot }} executou mais de 1000 rotinas na última hora"
+          description: "O usuário {{ $labels.user }} executou mais de 1000 rotinas na última hora"
 
       # Alert para exporter offline
       - alert: ExporterDown

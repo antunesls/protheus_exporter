@@ -29,7 +29,7 @@ ROUTINE_CALLS = Counter(
 ROUTINE_USER_CALLS = Counter(
     "protheus_routine_user_calls_total",
     "Total de chamadas de rotinas no Protheus por usuário",
-    ["routine", "environment", "user", "company", "branch", "module"],
+    ["routine", "environment", "user", "user_name", "company", "branch", "module"],
 )
 
 lock = threading.Lock()
@@ -55,6 +55,7 @@ def track():
       "routine": "MATA010",
       "environment": "PROD",
       "user": "LUCAS",
+      "user_name": "Lucas Silva",
       "company": "01",
       "branch": "0101",
       "module": "FAT"
@@ -65,6 +66,7 @@ def track():
     routine     = (data.get("routine") or "").strip().upper()
     environment = (data.get("environment") or DEFAULT_ENV).strip().upper()
     user        = (data.get("user") or "UNKNOWN").strip().upper()
+    user_name   = (data.get("user_name") or "UNKNOWN").strip()
     company     = (data.get("company") or "00").strip()
     branch      = (data.get("branch") or "0000").strip()
     module      = (data.get("module") or "UNKNOWN").strip().upper()
@@ -87,6 +89,7 @@ def track():
             routine=routine,
             environment=environment,
             user=user,
+            user_name=user_name,
             company=company,
             branch=branch,
             module=module,

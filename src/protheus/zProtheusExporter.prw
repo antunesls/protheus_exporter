@@ -13,6 +13,7 @@ User Function PromTrackRoutine( cRoutine, cEnv, cCompany, cBranch, cModule, cUse
     Local nTimeOut  := 30
     Local aHeadOut  := {}
     Local cHeadRet  := ""
+    Local cNome     := ""
 
     If Empty(cRoutine)
         Return .F.
@@ -36,8 +37,13 @@ User Function PromTrackRoutine( cRoutine, cEnv, cCompany, cBranch, cModule, cUse
 	endif
 
 	if Empty(cUser)
-		cUser := RetCodUsr()       // ou RetCodUsr(), FWGetUser(), etc.
+		cUser := Alltrim( UsrRetName() )       // ou RetCodUsr(), FWGetUser(), etc.
 	endif
+
+	// Obter nome completo do usuário
+	cNome := Alltrim( UsrFullName(RetCodUsr()) )       // Nome completo do usuário
+
+    
 
     // Monta JSON
     oJson["routine"]     := Upper(cRoutine)
@@ -46,6 +52,7 @@ User Function PromTrackRoutine( cRoutine, cEnv, cCompany, cBranch, cModule, cUse
     oJson["branch"]      := cBranch
     oJson["module"]      := Upper(cModule)
     oJson["user"]        := Upper(cUser)
+    oJson["user_name"]   := cNome
 
     cBody := oJson:ToJson()
 
