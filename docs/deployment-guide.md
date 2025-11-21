@@ -4,16 +4,39 @@
 
 ### 🔧 Desenvolvimento Local
 ```bash
-# Servidor Python standalone
+# Servidor Python standalone (desenvolvimento apenas)
 cd src/python
 python -m venv venv
 source venv/bin/activate  # Linux/Mac
 venv\Scripts\activate     # Windows
 pip install -r requirements.txt
+
+# Modo desenvolvimento
 python protheus_exporter.py
+# ou
+./start.sh dev       # Linux/Mac
+.\start.ps1 dev      # Windows
 
 # Configuração Protheus
 #define EXPORTER_URL "http://localhost:8000/track"
+```
+
+### 🏭 Produção (Gunicorn)
+```bash
+# Servidor WSGI de produção
+cd src/python
+pip install -r requirements.txt
+
+# Iniciar com Gunicorn
+gunicorn -c gunicorn.conf.py protheus_exporter:app
+# ou
+./start.sh prod       # Linux/Mac
+.\start.ps1 prod      # Windows
+
+# Configurações por ambiente
+export WORKERS=4              # Número de workers
+export FLASK_PORT=8000       # Porta do servidor
+export PROTHEUS_ENV=PROD     # Ambiente padrão
 ```
 
 ### 🐳 Docker Local

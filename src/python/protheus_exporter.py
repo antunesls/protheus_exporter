@@ -108,5 +108,13 @@ def metrics():
 
 
 if __name__ == "__main__":
-    # Pode ler host/port de env var também se quiser
-    app.run(host="0.0.0.0", port=8000)
+    # Configurações do servidor
+    host = os.environ.get("FLASK_HOST", "0.0.0.0")
+    port = int(os.environ.get("FLASK_PORT", "8000"))
+    debug = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
+    
+    print(f"🚀 Iniciando Protheus Exporter em {host}:{port}")
+    print("⚠️  AVISO: Este é o servidor de desenvolvimento do Flask.")
+    print("📝 Para produção, use: gunicorn -w 4 -b 0.0.0.0:8000 protheus_exporter:app")
+    
+    app.run(host=host, port=port, debug=debug)
