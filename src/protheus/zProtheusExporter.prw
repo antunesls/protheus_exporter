@@ -1,12 +1,9 @@
 #Include "totvs.ch"
 
-#define EXPORTER_URL   "http://groot.insider.testes:8000/track"
-
 // Função para ser chamada nas rotinas Protheus
 // Parâmetros opcionais: se não passar, ele tenta descobrir do ambiente
 User Function PromTrackRoutine( cRoutine, cEnv, cCompany, cBranch, cModule, cUser )
 
-    Local cUrl      := EXPORTER_URL
     Local cBody     := ""
     Local oJson     := JsonObject():New()
     Local cResult   := ""
@@ -14,6 +11,9 @@ User Function PromTrackRoutine( cRoutine, cEnv, cCompany, cBranch, cModule, cUse
     Local aHeadOut  := {}
     Local cHeadRet  := ""
     Local cNome     := ""
+
+    Local cURL := GetMV("XZ_TELMURL",,"") 
+
 
     If Empty(cRoutine)
         Return .F.
