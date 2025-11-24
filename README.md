@@ -41,7 +41,7 @@ docker-compose -f deployments/docker/docker-compose-hub.yml up -d
 
 ```bash
 # Usando imagem do Docker Hub
-docker run -d -p 8000:8000 --name protheus-exporter antunesls/protheus_exporter:0.1
+docker run -d -p 8000:8000 --name protheus-exporter antunesls/protheus_exporter:0.2
 
 # Verificar funcionamento
 curl http://localhost:8000/health
