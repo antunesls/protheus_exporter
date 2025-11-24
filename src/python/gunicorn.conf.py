@@ -5,11 +5,12 @@ import os
 
 # Configurações básicas
 bind = f"0.0.0.0:{os.environ.get('PORT', '8000')}"
-workers = int(os.environ.get('WORKERS', '4'))
+workers = int(os.environ.get('WORKERS', '2'))
 worker_class = "sync"
 worker_connections = 1000
-timeout = 30
-keepalive = 2
+timeout = 120
+keepalive = 5
+graceful_timeout = 30
 
 # Logging
 accesslog = "-"  # stdout
@@ -36,3 +37,4 @@ print(f"🚀 Configurando Gunicorn:")
 print(f"   Workers: {workers}")
 print(f"   Bind: {bind}")
 print(f"   Timeout: {timeout}s")
+print(f"   Graceful Timeout: {graceful_timeout}s")
