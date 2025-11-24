@@ -112,7 +112,29 @@ u_PromTrackRoutine("MATA010")
 u_PromTrackRoutine("MATA010", "PROD", "01", "0101", "EST", "ADMIN")
 ```
 
-### 2. Ambiente Python (Desenvolvimento Local)
+### 2. Prometheus
+
+Configure o `prometheus.yml` para coletar métricas do exporter:
+
+```yaml
+scrape_configs:
+  - job_name: 'protheus-exporter'
+    static_configs:
+      - targets: ['protheus-exporter:8000']  # ou 'localhost:8000' se local
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+```
+
+**Parâmetros importantes:**
+- `targets`: Endereço do exporter (ajuste conforme seu ambiente)
+- `metrics_path`: Endpoint de métricas (sempre `/metrics`)
+- `scrape_interval`: Intervalo de coleta (recomendado: 15s)
+- `scrape_timeout`: Timeout da requisição (deve ser < scrape_interval)
+
+> ⚠️ **Atenção:** Se usar Docker Compose, o target deve ser o nome do serviço (`protheus-exporter:8000`). Para instalação local, use `localhost:8000`.
+
+### 3. Ambiente Python (Desenvolvimento Local)
 
 ```bash
 # Navegue para o código Python
