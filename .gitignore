@@ -225,3 +225,7 @@ temp_restore/
 
 # Offline installation packages
 python-packages/
+
+# Metrics persistence data
+src/python/data/
+metrics_data.json
