@@ -1,4 +1,4 @@
-# Script para atualizar o Protheus Exporter Service
+﻿# Script para atualizar o Protheus Exporter Service
 # Requer privilégios de Administrador
 
 param(
@@ -222,3 +222,4 @@ Write-Host "💡 Comandos úteis:" -ForegroundColor Cyan
 Write-Host "   Ver status: Get-Service ProtheusExporter" -ForegroundColor White
 Write-Host "   Ver logs: Get-Content '$ServicePath\logs\protheus_exporter_service.log' -Tail 50" -ForegroundColor White
 Write-Host "   Testar: Invoke-WebRequest http://localhost:8000/health" -ForegroundColor White
+
