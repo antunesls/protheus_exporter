@@ -54,7 +54,23 @@ ROUTINE_CALLS = Counter(
 
 # Métrica por usuário (use com cuidado – cardinalidade!)
 ROUTINE_USER_CALLS = Counter(
-  Funções auxiliares para persistência
+    "protheus_routine_user_calls_total",
+    "Total de chamadas de rotinas no Protheus por usuário",
+    ["routine", "environment", "user", "user_name", "company", "branch", "module"],
+)
+
+# Métrica de uptime do exporter
+EXPORTER_START_TIME = time.time()
+EXPORTER_UPTIME = Gauge(
+    "protheus_exporter_uptime_seconds",
+    "Tempo em segundos desde que o exporter foi iniciado"
+)
+
+lock = threading.Lock()
+
+
+# -------------------------------------------------------------------
+# Funções auxiliares para persistência
 # -------------------------------------------------------------------
 def restore_counter_from_persistence(counter, metric_name):
     """Restaura valores de um contador a partir da persistência"""
@@ -96,22 +112,6 @@ def periodic_save():
 if persistence:
     atexit.register(save_metrics_to_disk)
     periodic_save()
-
-
-# -------------------------------------------------------------------
-#   "protheus_routine_user_calls_total",
-    "Total de chamadas de rotinas no Protheus por usuário",
-    ["routine", "environment", "user", "user_name", "company", "branch", "module"],
-)
-
-# Métrica de uptime do exporter
-EXPORTER_START_TIME = time.time()
-EXPORTER_UPTIME = Gauge(
-    "protheus_exporter_uptime_seconds",
-    "Tempo em segundos desde que o exporter foi iniciado"
-)
-
-lock = threading.Lock()
 
 
 # -------------------------------------------------------------------
