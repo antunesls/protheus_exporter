@@ -40,17 +40,45 @@ Isso criará uma pasta `python-packages` com todos os arquivos `.whl` necessári
 
 ```powershell
 # Sintaxe completa
-.\download-dependencies.ps1 [-PythonPath <caminho>] [-OutputDir <diretório>]
+.\download-dependencies.ps1 [-PythonPath <caminho>] [-OutputDir <diretório>] [-TargetPython <versão>] [-Platform <plataforma>]
 
 # Exemplos:
+
+# Download para a versão local do Python
 .\download-dependencies.ps1
+
+# Download para uma versão específica do Python
+.\download-dependencies.ps1 -TargetPython "3.11"
+
+# Download para Python 3.12 64-bit
+.\download-dependencies.ps1 -TargetPython "3.12" -Platform "win_amd64"
+
+# Download para Python 3.11 32-bit
+.\download-dependencies.ps1 -TargetPython "3.11" -Platform "win32"
+
+# Diretório customizado
 .\download-dependencies.ps1 -OutputDir "C:\temp\packages"
+
+# Python customizado
 .\download-dependencies.ps1 -PythonPath "C:\Python311\python.exe"
 ```
 
 **Parâmetros:**
 - `-PythonPath`: Caminho customizado do Python (opcional)
 - `-OutputDir`: Diretório de saída para os pacotes (padrão: `.\python-packages`)
+- `-TargetPython`: Versão específica do Python (ex: "3.11", "3.12", "3.13")
+- `-Platform`: Plataforma de destino: "win_amd64" (64-bit) ou "win32" (32-bit)
+
+### ⚠️ Importante: Versões Específicas
+
+Se você baixar os pacotes no **Windows 11** com Python 3.13 mas o **Windows Server** tiver Python 3.11, os pacotes **NÃO funcionarão**.
+
+**Solução:** Use `-TargetPython` para baixar para a versão correta:
+
+```powershell
+# No Windows 11, baixar para Python 3.11 (que está no servidor)
+.\download-dependencies.ps1 -TargetPython "3.11" -Platform "win_amd64"
+```
 
 ## 📝 Opções do Script de Instalação Offline
 

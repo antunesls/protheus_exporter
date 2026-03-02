@@ -1,9 +1,13 @@
 ﻿# Script para baixar dependências Python para instalação offline
 # Uso: .\download-dependencies.ps1
+# Uso com versão específica: .\download-dependencies.ps1 -TargetPython "3.11" -Platform "win_amd64"
 
 param(
     [string]$PythonPath = "",
-    [string]$OutputDir = ".\python-packages"
+    [string]$OutputDir = ".\python-packages",
+    [string]$TargetPython = "",
+    [ValidateSet("win_amd64", "win32", "")]
+    [string]$Platform = ""
 )
 
 Write-Host "📦 Download de Dependências para Instalação Offline" -ForegroundColor Cyan
@@ -20,6 +24,16 @@ if (-not $PythonPath) {
 }
 
 Write-Host "✅ Python encontrado: $PythonPath" -ForegroundColor Green
+
+# Verificar versão e arquitetura
+$pythonVersion = & $PythonPath --version 2>&1
+$pythonArch = & $PythonPath -c "import platform; print(platform.architecture()[0])" 2>&1
+Write-Host "   Versão: $pythonVersion" -ForegroundColor Gray
+Write-Host "   Arquitetura: $pythonArch" -ForegroundColor Gray
+Write-Host ""
+Write-Host "⚠️  IMPORTANTE: Os pacotes serão baixados para esta versão do Python!" -ForegroundColor Yellow
+Write-Host "   Se o servidor tiver versão diferente, os pacotes NÃO funcionarão." -ForegroundColor Yellow
+Write-Host ""
 
 # Verificar pip
 $pipVersion = & $PythonPath -m pip --version 2>&1
@@ -46,10 +60,30 @@ if (-not (Test-Path $requirementsFile)) {
 }
 
 Write-Host "⬇️  Baixando dependências de $requirementsFile..." -ForegroundColor Yellow
+
+if ($TargetPython -or $Platform) {
+    Write-Host "🎯 Download para versão específica:" -ForegroundColor Cyan
+    if ($TargetPython) { Write-Host "   Python: $TargetPython" -ForegroundColor Gray }
+    if ($Platform) { Write-Host "   Plataforma: $Platform" -ForegroundColor Gray }
+}
+
 Write-Host ""
 
 try {
-    & $PythonPath -m pip download -r $requirementsFile -d $OutputDirFull
+    # Construir comando com parâmetros opcionais
+    $pipArgs = @("-m", "pip", "download", "-r", $requirementsFile, "-d", $OutputDirFull)
+    
+    if ($TargetPython) {
+        $pipArgs += "--python-version=$TargetPython"
+        $pipArgs += "--only-binary=:all:"
+    }
+    
+    if ($Platform) {
+        $pipArgs += "--platform=$Platform"
+        $pipArgs += "--only-binary=:all:"
+    }
+    
+    & $PythonPath $pipArgs
     
     if ($LASTEXITCODE -ne 0) {
         throw "Erro ao baixar dependências"
@@ -72,6 +106,14 @@ try {
     Write-Host ""
     Write-Host "   Ou manualmente:" -ForegroundColor Gray
     Write-Host "   python -m pip install --no-index --find-links=$OutputDirFull -r $requirementsFile" -ForegroundColor White
+    Write-Host ""
+    Write-Host "⚠️  COMPATIBILIDADE:" -ForegroundColor Yellow
+    if ($TargetPython -or $Platform) {
+        Write-Host "   Estes pacotes são para: Python $TargetPython ($Platform)" -ForegroundColor Yellow
+    } else {
+        Write-Host "   Estes pacotes são para: $pythonVersion ($pythonArch)" -ForegroundColor Yellow
+    }
+    Write-Host "   O servidor de destino DEVE ter a mesma versão e arquitetura!" -ForegroundColor Yellow
     
 } catch {
     Write-Host ""

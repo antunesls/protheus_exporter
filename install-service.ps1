@@ -83,7 +83,13 @@ if (Test-Path $requirementsFile) {
         
         $PackagesDirFull = Resolve-Path $PackagesDir
         Write-Host "   Instalando dependências do cache local: $PackagesDirFull" -ForegroundColor Gray
-        & $PythonPath -m pip install --no-index --find-links=$PackagesDirFull -r $requirementsFile
+        
+        # Listar pacotes disponíveis
+        $availablePackages = Get-ChildItem -Path $PackagesDirFull -Filter "*.whl" | Select-Object -First 5
+        Write-Host "   Pacotes disponíveis: $($availablePackages.Count) arquivos .whl" -ForegroundColor Gray
+        
+        # Instalar com verbose para debug
+        & $PythonPath -m pip install --no-index --find-links="$PackagesDirFull" -r $requirementsFile
     } else {
         # Modo online - baixar da internet
         Write-Host "   Instalando dependências de $requirementsFile" -ForegroundColor Gray
