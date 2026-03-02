@@ -1,10 +1,12 @@
-# Script para instalar o Protheus Exporter como Serviço Windows
+﻿# Script para instalar o Protheus Exporter como Serviço Windows
 # Requer privilégios de Administrador
 
 param(
     [string]$PythonPath = "",
     [string]$ServicePath = "",
-    [switch]$AutoStart
+    [switch]$AutoStart,
+    [switch]$Offline,
+    [string]$PackagesDir = ".\python-packages"
 )
 
 # Verificar se está rodando como Administrador
@@ -35,12 +37,22 @@ Write-Host "✅ Python encontrado: $PythonPath" -ForegroundColor Green
 # Verificar versão do Python
 $pythonVersion = & $PythonPath --version 2>&1
 Write-Host "   Versão: $pythonVersion" -ForegroundColor Gray
+Write-Host ""
 
 # Determinar caminho do serviço
-if (-not $ServicePath) {
-    $ServicePath = Join-Path $PSScriptRoot "src\python"
-    if (-not (Test-Path $ServicePath)) {
+Write-Host "🔍 Determinando caminho do serviço..." -ForegroundColor Yellow
+
+# Garantir que ServicePath seja definido
+if (-not $ServicePath -or $ServicePath -eq "") {
+    $testPath = Join-Path $PSScriptRoot "src\python"
+    Write-Host "   Testando: $testPath" -ForegroundColor Gray
+    
+    if (Test-Path $testPath) {
+        $ServicePath = $testPath
+        Write-Host "   ✅ Encontrado em: $ServicePath" -ForegroundColor Green
+    } else {
         $ServicePath = $PSScriptRoot
+        Write-Host "   ✅ Usando raiz do projeto: $ServicePath" -ForegroundColor Green
     }
 }
 
@@ -48,6 +60,8 @@ $serviceScript = Join-Path $ServicePath "protheus_exporter_service.py"
 
 if (-not (Test-Path $serviceScript)) {
     Write-Host "❌ Arquivo do serviço não encontrado: $serviceScript" -ForegroundColor Red
+    Write-Host "   ServicePath atual: $ServicePath" -ForegroundColor Gray
+    Write-Host "   PSScriptRoot: $PSScriptRoot" -ForegroundColor Gray
     exit 1
 }
 
@@ -59,8 +73,22 @@ Write-Host "📦 Verificando dependências..." -ForegroundColor Yellow
 
 $requirementsFile = Join-Path $ServicePath "requirements-windows.txt"
 if (Test-Path $requirementsFile) {
-    Write-Host "   Instalando dependências de $requirementsFile" -ForegroundColor Gray
-    & $PythonPath -m pip install -r $requirementsFile --upgrade
+    if ($Offline) {
+        # Modo offline - instalar de cache local
+        if (-not (Test-Path $PackagesDir)) {
+            Write-Host "❌ Diretório de pacotes não encontrado: $PackagesDir" -ForegroundColor Red
+            Write-Host "   Execute primeiro: .\download-dependencies.ps1" -ForegroundColor Yellow
+            exit 1
+        }
+        
+        $PackagesDirFull = Resolve-Path $PackagesDir
+        Write-Host "   Instalando dependências do cache local: $PackagesDirFull" -ForegroundColor Gray
+        & $PythonPath -m pip install --no-index --find-links=$PackagesDirFull -r $requirementsFile
+    } else {
+        # Modo online - baixar da internet
+        Write-Host "   Instalando dependências de $requirementsFile" -ForegroundColor Gray
+        & $PythonPath -m pip install -r $requirementsFile --upgrade
+    }
     
     if ($LASTEXITCODE -ne 0) {
         Write-Host "❌ Erro ao instalar dependências!" -ForegroundColor Red
@@ -146,7 +174,7 @@ Write-Host ""
 Write-Host "🔗 URLs:" -ForegroundColor Cyan
 Write-Host "   Healthcheck: http://localhost:8000/health" -ForegroundColor White
 Write-Host "   Métricas: http://localhost:8000/metrics" -ForegroundColor White
-Write-Host "   Track: http://localhost:8000/track (POST)" -ForegroundColor White
+Write-Host "   Track: http://localhost:8000/track [POST]" -ForegroundColor White
 Write-Host ""
 Write-Host "📝 Logs:" -ForegroundColor Cyan
 Write-Host "   Diretório: $ServicePath\logs" -ForegroundColor White
@@ -157,7 +185,7 @@ Write-Host "   Ver status: Get-Service ProtheusExporter" -ForegroundColor White
 Write-Host "   Iniciar: Start-Service ProtheusExporter" -ForegroundColor White
 Write-Host "   Parar: Stop-Service ProtheusExporter" -ForegroundColor White
 Write-Host "   Reiniciar: Restart-Service ProtheusExporter" -ForegroundColor White
-Write-Host "   Ver logs: Get-Content '$ServicePath\logs\protheus_exporter_service.log' -Tail 50 -Wait" -ForegroundColor White
+Write-Host "   Ver logs: Get-Content `"$ServicePath\logs\protheus_exporter_service.log`" -Tail 50 -Wait" -ForegroundColor White
 Write-Host "   Desinstalar: .\uninstall-service.ps1" -ForegroundColor White
 Write-Host ""
 Write-Host "✅ Instalação concluída!" -ForegroundColor Green
@@ -176,3 +204,4 @@ try {
     Write-Host "⚠️  Não foi possível conectar ao serviço" -ForegroundColor Yellow
     Write-Host "   Verifique os logs para mais detalhes" -ForegroundColor Gray
 }
+

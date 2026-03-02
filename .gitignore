@@ -222,3 +222,6 @@ backups/
 
 # Temp files
 temp_restore/
+
+# Offline installation packages
+python-packages/

@@ -1,4 +1,4 @@
-"""
+r"""
 Protheus Exporter - Windows Service Wrapper
 
 Este módulo permite executar o Protheus Exporter como um serviço Windows nativo.
