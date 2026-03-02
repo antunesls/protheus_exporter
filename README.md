@@ -15,9 +15,10 @@ Solução profissional para coleta, processamento e visualização de métricas 
 - 🔄 **Interceptação Automática**: Captura automática de execuções via CHKEXEC
 - 📊 **Dashboard Rico**: Visualizações abrangentes no Grafana
 - 🚨 **Sistema de Alertas**: Monitoramento proativo com Prometheus
-- 🐳 **Deploy Simplificado**: Containerização completa com Docker
+- 🐳 **Deploy Flexível**: Docker, Python standalone ou Serviço Windows nativo
 - 📈 **Métricas Detalhadas**: Análise por usuário, empresa, módulo e ambiente
 - ⚡ **Alta Performance**: Otimizado para ambientes de produção
+- 💾 **Persistência de Dados**: Dados não voláteis com backup/restore automático
 
 ## 🚀 Início Rápido
 
@@ -46,6 +47,20 @@ docker run -d -p 8000:8000 --name protheus-exporter antunesls/protheus_exporter:
 # Verificar funcionamento
 curl http://localhost:8000/health
 ```
+
+### Serviço Windows (Windows Server)
+
+```powershell
+# Instalação como serviço nativo do Windows
+.\install-service.ps1
+
+# Gerenciamento
+.\manage-service.ps1 status
+.\manage-service.ps1 start
+.\manage-service.ps1 stop
+```
+
+📚 **[Guia completo de instalação como serviço Windows →](WINDOWS-SERVICE.md)**
 
 ## 📁 Estrutura do Projeto
 

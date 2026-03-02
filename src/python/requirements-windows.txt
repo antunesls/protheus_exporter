@@ -1,0 +1,13 @@
+# Requirements para Windows Service
+# Instalação: pip install -r requirements-windows.txt
+
+# Core dependencies (mesmo do requirements.txt)
+flask==3.0.0
+prometheus-client==0.19.0
+
+# Windows Service dependencies
+pywin32==306
+waitress==3.0.0
+
+# Optional: para melhor logging
+colorlog==6.8.0
