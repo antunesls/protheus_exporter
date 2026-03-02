@@ -215,3 +215,10 @@ temp*/
 
 # Docker
 .dockerignore
+# Persistent Data (Prometheus & Grafana)
+data/
+# Backups
+backups/
+
+# Temp files
+temp_restore/

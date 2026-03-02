@@ -41,7 +41,7 @@ docker-compose -f deployments/docker/docker-compose-hub.yml up -d
 
 ```bash
 # Usando imagem do Docker Hub
-docker run -d -p 8000:8000 --name protheus-exporter antunesls/protheus_exporter:0.2
+docker run -d -p 8000:8000 --name protheus-exporter antunesls/protheus_exporter:2.0
 
 # Verificar funcionamento
 curl http://localhost:8000/health
@@ -256,6 +256,35 @@ docker build -f deployments/docker/Dockerfile -t protheus-exporter .
 # Executar container
 docker run -p 8000:8000 protheus-exporter
 ```
+
+### 📦 Persistência de Dados
+
+**Todos os dados são persistidos em disco** no diretório `data/`:
+
+- 📊 **Prometheus**: Métricas armazenadas em `data/prometheus/`
+- 📈 **Grafana**: Dashboards e configurações em `data/grafana/`
+- 🔄 **Retenção**: Métricas do Prometheus mantidas por 200 horas (~8 dias)
+
+**Scripts de Gerenciamento:**
+
+```powershell
+# Verificar persistência dos dados
+.\check-persistence.ps1
+
+# Criar backup dos dados
+.\backup-data.ps1
+
+# Restaurar backup
+.\restore-data.ps1
+```
+
+**Características:**
+- ✅ Dados sobrevivem a reinicializações
+- ✅ Backup e restore simples
+- ✅ Acesso direto aos arquivos
+- ✅ Não depende de volumes Docker
+
+📚 **[Leia a documentação completa sobre persistência →](DATA-PERSISTENCE.md)**
 
 ## 🔧 Desenvolvimento
 

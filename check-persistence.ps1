@@ -3,9 +3,44 @@
 
 Write-Host "🔍 Verificando persistência de dados..." -ForegroundColor Cyan
 
-# Verificar volumes do Docker
+# Verificar diretórios locais de dados
+Write-Host "`n📁 Diretórios de dados persistidos:" -ForegroundColor Yellow
+$dataPath = Join-Path $PSScriptRoot "data"
+if (Test-Path $dataPath) {
+    Write-Host "✅ Diretório data/ encontrado" -ForegroundColor Green
+    
+    # Verificar Prometheus
+    $prometheusPath = Join-Path $dataPath "prometheus"
+    if (Test-Path $prometheusPath) {
+        $prometheusSize = (Get-ChildItem $prometheusPath -Recurse -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum).Sum
+        $prometheusFiles = (Get-ChildItem $prometheusPath -Recurse -File -ErrorAction SilentlyContinue | Measure-Object).Count
+        Write-Host "   📊 Prometheus: $prometheusFiles arquivos, $([math]::Round($prometheusSize/1MB, 2)) MB" -ForegroundColor White
+    } else {
+        Write-Host "   ⚠️  Prometheus: Diretório não encontrado" -ForegroundColor Yellow
+    }
+    
+    # Verificar Grafana
+    $grafanaPath = Join-Path $dataPath "grafana"
+    if (Test-Path $grafanaPath) {
+        $grafanaSize = (Get-ChildItem $grafanaPath -Recurse -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum).Sum
+        $grafanaFiles = (Get-ChildItem $grafanaPath -Recurse -File -ErrorAction SilentlyContinue | Measure-Object).Count
+        Write-Host "   📈 Grafana: $grafanaFiles arquivos, $([math]::Round($grafanaSize/1MB, 2)) MB" -ForegroundColor White
+    } else {
+        Write-Host "   ⚠️  Grafana: Diretório não encontrado" -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "❌ Diretório data/ não encontrado" -ForegroundColor Red
+}
+
+# Verificar volumes do Docker (não devem mais existir)
 Write-Host "`n📦 Volumes Docker:" -ForegroundColor Yellow
-docker volume ls | Where-Object { $_ -match "prometheus|grafana" }
+$volumes = docker volume ls | Where-Object { $_ -match "prometheus|grafana" }
+if ($volumes) {
+    Write-Host "⚠️  Volumes antigos encontrados (podem ser removidos):" -ForegroundColor Yellow
+    Write-Host $volumes -ForegroundColor White
+} else {
+    Write-Host "✅ Nenhum volume Docker encontrado (usando bind mounts)" -ForegroundColor Green
+}
 
 # Verificar dados no Prometheus
 Write-Host "`n📊 Consultando métricas no Prometheus:" -ForegroundColor Yellow

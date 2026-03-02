@@ -24,8 +24,7 @@ services:
     volumes:
       - ../../configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ../../configs/prometheus/alert_rules.yml:/etc/prometheus/alert_rules.yml
-      - prometheus_data:/prometheus
-      - prometheus_config:/etc/prometheus
+      - ../../data/prometheus:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -43,7 +42,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - grafana_data:/var/lib/grafana
+      - ../../data/grafana:/var/lib/grafana
       - ../../configs/grafana/provisioning:/etc/grafana/provisioning
       - ../../configs/grafana/dashboards:/var/lib/grafana/dashboards
     environment:
@@ -53,8 +52,3 @@ services:
     restart: unless-stopped
     depends_on:
       - prometheus
-
-volumes:
-  prometheus_data:
-  prometheus_config:
-  grafana_data:
