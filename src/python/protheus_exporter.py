@@ -59,16 +59,6 @@ ROUTINE_USER_CALLS = Counter(
     ["routine", "environment", "user", "user_name", "company", "branch", "module"],
 )
 
-# Métrica de uptime do exporter
-EXPORTER_START_TIME = time.time()
-EXPORTER_UPTIME = Gauge(
-    "protheus_exporter_uptime_seconds",
-    "Tempo em segundos desde que o exporter foi iniciado"
-)
-
-lock = threading.Lock()
-
-
 # -------------------------------------------------------------------
 # Funções auxiliares para persistência
 # -------------------------------------------------------------------
@@ -78,6 +68,7 @@ def restore_counter_from_persistence(counter, metric_name):
         return
     
     saved_counters = persistence.get_all_counters(metric_name)
+    print(f"🔄 Restaurando {len(saved_counters)} séries para {metric_name}...")
     for label_key, data in saved_counters.items():
         labels = data["labels"]
         value = data["value"]
@@ -85,6 +76,20 @@ def restore_counter_from_persistence(counter, metric_name):
         # Incrementar o contador para o valor salvo
         if value > 0:
             counter.labels(**labels).inc(value)
+
+# Restaurar métricas existentes
+if persistence:
+    restore_counter_from_persistence(ROUTINE_CALLS, "protheus_routine_calls_total")
+    restore_counter_from_persistence(ROUTINE_USER_CALLS, "protheus_routine_user_calls_total")
+
+# Métrica de uptime do exporter
+EXPORTER_START_TIME = time.time()
+EXPORTER_UPTIME = Gauge(
+    "protheus_exporter_uptime_seconds",
+    "Tempo em segundos desde que o exporter foi iniciado"
+)
+
+lock = threading.Lock()
 
 
 def save_metrics_to_disk():
@@ -134,33 +139,7 @@ def health():
 @app.route("/track", methods=["POST"])
 def track():
     """
-        
-        # Salvar na persistência se habilitada
-        if persistence:
-            # Obter valores atuais dos contadores (simplificado)
-            # Em produção, seria melhor manter um contador interno
-            persistence.save_counter(
-                "protheus_routine_calls_total",
-                {
-                    "routine": routine,
-                    "environment": environment,
-                    "company": company,
-                    "branch": branch,
-                    "module": module,
-                },
-                1  # Incremento
-            )
-    Exemplo de JSON esperado do Protheus:
-
-    {
-      "routine": "MATA010",
-      "environment": "PROD",
-      "user": "LUCAS",
-      "user_name": "Lucas Silva",
-      "company": "01",
-      "branch": "0101",
-      "module": "FAT"
-    }
+    Endpoint que recebe as telemetrias do Protheus via POST JSON.
     """
     data = request.get_json(silent=True) or {}
 
@@ -176,25 +155,42 @@ def track():
         return jsonify({"error": "Campo 'routine' é obrigatório"}), 400
 
     with lock:
-        # Agregado
-        ROUTINE_CALLS.labels(
-            routine=routine,
-            environment=environment,
-            company=company,
-            branch=branch,
-            module=module,
-        ).inc()
+        # 1. Agregado
+        labels_agg = {
+            "routine": routine,
+            "environment": environment,
+            "company": company,
+            "branch": branch,
+            "module": module,
+        }
+        metric_agg = ROUTINE_CALLS.labels(**labels_agg)
+        metric_agg.inc()
 
-        # Por usuário
-        ROUTINE_USER_CALLS.labels(
-            routine=routine,
-            environment=environment,
-            user=user,
-            user_name=user_name,
-            company=company,
-            branch=branch,
-            module=module,
-        ).inc()
+        # 2. Por usuário
+        labels_user = {
+            "routine": routine,
+            "environment": environment,
+            "user": user,
+            "user_name": user_name,
+            "company": company,
+            "branch": branch,
+            "module": module,
+        }
+        metric_user = ROUTINE_USER_CALLS.labels(**labels_user)
+        metric_user.inc()
+
+        # 3. Persistência (Salvar valor atual no cache)
+        if persistence:
+            persistence.save_counter(
+                "protheus_routine_calls_total", 
+                labels_agg, 
+                metric_agg._value.get()
+            )
+            persistence.save_counter(
+                "protheus_routine_user_calls_total", 
+                labels_user, 
+                metric_user._value.get()
+            )
 
     return jsonify({"status": "ok"}), 200
 
