@@ -104,18 +104,17 @@ jobs:
           path: dist/
 
       - name: Generate release notes
-        id: release_notes
         run: |
           VERSION="${{ needs.build-package.outputs.version }}"
           echo "Extracting changelog for version ${VERSION}..."
-          python3 .github/scripts/extract_changelog.py "$VERSION"
+          python3 .github/scripts/extract_changelog.py "$VERSION" RELEASE_NOTES.md
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
-          body: ${{ steps.release_notes.outputs.notes }}
+          body_path: RELEASE_NOTES.md
           files: dist/*
           draft: false
           prerelease: false
