@@ -107,20 +107,19 @@ jobs:
         run: |
           VERSION="${{ needs.build-package.outputs.version }}"
           echo "Extracting changelog for version ${VERSION}..."
-          python3 .github/scripts/extract_changelog.py "$VERSION" RELEASE_NOTES.md
+          python3 .github/scripts/extract_changelog.py "$VERSION" /tmp/notes.md
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
-          body_path: RELEASE_NOTES.md
-          files: dist/*
-          draft: false
-          prerelease: false
-          generate_release_notes: false
+      - name: Create GitHub Release
+        run: |
+          TAG="${{ github.ref_name }}"
+          echo "Creating release for ${TAG}..."
+          gh release delete "${TAG}" -y 2>/dev/null || true
+          gh release create "${TAG}" \
+            --title "Release ${TAG}" \
+            --notes-file /tmp/notes.md \
+            dist/*
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # ──────────────────────────────────────────────
   # Job 4: Build & Push Docker Image
