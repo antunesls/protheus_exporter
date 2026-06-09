@@ -107,24 +107,21 @@ jobs:
           VERSION="${{ needs.build-package.outputs.version }}"
           echo "Extracting changelog for version ${VERSION}..."
 
-          # Extract the changelog section for this version
-          powershell -Command "
-            \$content = Get-Content CHANGELOG.md -Raw
-            \$pattern = '(?ms)\[${VERSION}\].*?(?=\[|$)'
-            if (\$content -match \$pattern) {
-              \$body = \$matches[0]
-              # Remove the header line
-              \$body = \$body -replace '^## .*', ''
-              \$body = \$body.Trim()
-              # Escape for GitHub output
-              \$body = \$body -replace '%', '%25'
-              \$body = \$body -replace '\r\n', '%0A'
-              \$body = \$body -replace '\n', '%0A'
-              Write-Output \"notes=\$body\"
-            } else {
-              Write-Output 'notes=Release ${{ needs.build-package.outputs.version }}'
-            }
-          " >> $GITHUB_OUTPUT
+          python3 -c "
+import re, sys
+with open('CHANGELOG.md') as f:
+    content = f.read()
+pattern = r'(?ms)\[' + sys.argv[1] + r'\].*?(?=\[|\Z)'
+match = re.search(pattern, content)
+if match:
+    body = match.group(0)
+    body = re.sub(r'^## .*', '', body).strip()
+    body = body.replace('%', '%25')
+    body = body.replace('\n', '%0A')
+    print(f'notes={body}')
+else:
+    print(f'notes=Release {sys.argv[1]}')
+" "$VERSION" >> $GITHUB_OUTPUT
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
