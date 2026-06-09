@@ -108,10 +108,7 @@ jobs:
         run: |
           VERSION="${{ needs.build-package.outputs.version }}"
           echo "Extracting changelog for version ${VERSION}..."
-          NOTES=$(python3 .github/scripts/extract_changelog.py "$VERSION")
-          echo "notes<<EOF" >> $GITHUB_OUTPUT
-          echo "$NOTES" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          python3 .github/scripts/extract_changelog.py "$VERSION"
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
