@@ -2,10 +2,9 @@
 
 Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
-O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
-e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
+O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
-## [2.0.0] - 2026-03-02
+## [2.0] - 2026-03-02
 
 ### 🎉 Adicionado
 - **Persistência de dados não volátil**: Dados do Prometheus e Grafana agora são salvos em diretórios locais (`data/`)

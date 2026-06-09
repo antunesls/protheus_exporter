@@ -229,3 +229,8 @@ python-packages/
 # Metrics persistence data
 src/python/data/
 metrics_data.json
+
+# Build artifacts
+dist/
+*.egg-info/
+**/*.egg-info/

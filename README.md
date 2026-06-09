@@ -2,9 +2,12 @@
 
 > Sistema completo de monitoramento e métricas para Protheus ERP usando Prometheus e Grafana
 
-[![Docker](https://img.shields.io/badge/docker-available-blue.svg)](https://hub.docker.com/r/antunesls/protheus_exporter)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
+[![Release](https://img.shields.io/github/v/release/antunesls/protheus_exporter?style=flat-square)](https://github.com/antunesls/protheus_exporter/releases)
+[![CI/CD](https://img.shields.io/github/actions/workflow/status/antunesls/protheus_exporter/release.yml?branch=main&style=flat-square&label=CI%2FCD)](https://github.com/antunesls/protheus_exporter/actions)
+[![PyPI](https://img.shields.io/pypi/v/protheus-exporter?style=flat-square)](https://pypi.org/project/protheus-exporter/)
+[![Docker](https://img.shields.io/docker/pulls/antunesls/protheus_exporter?style=flat-square)](https://hub.docker.com/r/antunesls/protheus_exporter)
+[![License](https://img.shields.io/github/license/antunesls/protheus_exporter?style=flat-square)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.11+-blue?style=flat-square)](https://python.org)
 
 ## 🎯 Visão Geral
 

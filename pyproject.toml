@@ -1,0 +1,68 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "protheus-exporter"
+dynamic = ["version"]
+description = "Protheus Prometheus Exporter - Sistema de monitoramento e métricas para Protheus ERP"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+keywords = ["protheus", "prometheus", "grafana", "monitoring", "erp"]
+authors = [
+    {name = "Protheus Exporter Team"},
+]
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Framework :: Flask",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: Portuguese (Brazilian)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Monitoring",
+    "Topic :: System :: Monitoring",
+]
+
+dependencies = [
+    "flask==3.0.0",
+    "prometheus-client==0.19.0",
+]
+
+[project.optional-dependencies]
+prod = [
+    "gunicorn==21.2.0",
+]
+windows = [
+    "pywin32==311",
+    "waitress==3.0.0",
+    "colorlog==6.8.0",
+]
+dev = [
+    "gunicorn==21.2.0",
+    "pywin32==311",
+    "waitress==3.0.0",
+    "colorlog==6.8.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/antunesls/protheus_exporter"
+Repository = "https://github.com/antunesls/protheus_exporter"
+Changelog = "https://github.com/antunesls/protheus_exporter/releases"
+DockerHub = "https://hub.docker.com/r/antunesls/protheus_exporter"
+
+[project.scripts]
+protheus-exporter = "protheus_exporter:main"
+
+[tool.setuptools.dynamic]
+version = {file = ["VERSION"]}
+
+[tool.setuptools]
+py-modules = ["protheus_exporter", "protheus_exporter_service", "metrics_persistence"]
+package-dir = {"" = "src/python"}

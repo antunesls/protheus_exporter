@@ -206,8 +206,8 @@ def metrics():
     return data, 200, {"Content-Type": CONTENT_TYPE_LATEST}
 
 
-if __name__ == "__main__":
-    # Configurações do servidor
+def main():
+    """Ponto de entrada principal para execução do servidor"""
     host = os.environ.get("FLASK_HOST", "0.0.0.0")
     port = int(os.environ.get("FLASK_PORT", "8000"))
     debug = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
@@ -217,3 +217,7 @@ if __name__ == "__main__":
     print("📝 Para produção, use: gunicorn -w 4 -b 0.0.0.0:8000 protheus_exporter:app")
     
     app.run(host=host, port=port, debug=debug)
+
+
+if __name__ == "__main__":
+    main()

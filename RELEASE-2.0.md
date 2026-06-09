@@ -172,8 +172,8 @@ Após publicar com sucesso:
 
 1. **Tag Git** (opcional mas recomendado):
 ```powershell
-git tag -a v2.0.0 -m "Release 2.0.0 - Persistência de dados"
-git push origin v2.0.0
+git tag -a v2.0 -m "Release v2.0 - Persistência de dados e CI/CD"
+git push origin v2.0
 ```
 
 2. **Atualizar README** do Docker Hub:
@@ -189,5 +189,5 @@ git push origin v2.0.0
 ---
 
 **Data de preparação**: 02/03/2026  
-**Versão**: 2.0.0  
+**Versão**: 2.0  
 **Status**: Pronto para publicação ✅
